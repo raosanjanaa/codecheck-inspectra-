@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSPECTRA</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#0b0f1a;
+  --panel:#12182b;
+  --pink:#ff4ecd;
+  --soft:#1a2035;
+}
+
+body{
+  margin:0;
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:white;
+}
+
+/* NAVBAR */
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 25px;
+  background:var(--panel);
+  border-bottom:1px solid #222;
+}
+
+.logo{
+  color:var(--pink);
+  font-weight:700;
+}
+
+nav button{
+  background:none;
+  border:none;
+  color:#aaa;
+  margin-left:15px;
+  cursor:pointer;
+}
+
+nav button:hover{
+  color:var(--pink);
+}
+
+/* LAYOUT */
+.container{
+  display:flex;
+  height:calc(100vh - 60px);
+}
+
+/* PANELS */
+.editor, .output{
+  flex:1;
+  padding:20px;
+}
+
+.editor{
+  border-right:1px solid #222;
+}
+
+/* TEXTAREA */
+textarea{
+  width:100%;
+  height:65%;
+  background:#0f172a;
+  border:1px solid #222;
+  color:#fff;
+  padding:15px;
+  font-family:'JetBrains Mono';
+  border-radius:10px;
+}
+
+/* BUTTON */
+.btn{
+  margin-top:10px;
+  padding:12px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(45deg,#ff4ecd,#ff7ad9);
+  color:white;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+}
+
+/* OUTPUT CARDS */
+.card{
+  background:var(--soft);
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border-left:4px solid var(--pink);
+  animation:fade 0.3s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* CHAT */
+.chat{
+  display:none;
+  flex-direction:column;
+  height:100%;
+}
+
+.chatbox{
+  flex:1;
+  overflow:auto;
+}
+
+.msg{
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+  max-width:70%;
+}
+
+.user{
+  background:#222;
+  align-self:flex-end;
+}
+
+.bot{
+  background:#1a2035;
+  border-left:3px solid var(--pink);
+}
+
+</style>
+</head>
+
+<body>
+
+<nav>
+  <div class="logo">INSPECTRA ⚡</div>
+  <div>
+    <button onclick="switchTab('tutor')">Tutor</button>
+    <button onclick="switchTab('chat')">Chat</button>
+  </div>
+</nav>
+
+<!-- TUTOR -->
+<div id="tutor" class="container">
+
+  <div class="editor">
+    <h3>Code Editor</h3>
+    <textarea id="code" placeholder="Paste your code here..."></textarea>
+    <button class="btn" onclick="explain()">✨ Explain Code</button>
+  </div>
+
+  <div class="output">
+    <h3>AI Explanation</h3>
+    <div id="output">Nothing yet...</div>
+  </div>
+
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="container chat">
+  <div style="width:100%; display:flex; flex-direction:column;">
+    
+    <div id="chatbox" class="chatbox"></div>
+
+    <textarea id="msg" placeholder="Ask anything..."></textarea>
+    <button class="btn" onclick="send()">Send</button>
+
+  </div>
+</div>
+
+<script>
+
+// SWITCH TAB
+function switchTab(tab){
+  document.getElementById("tutor").style.display = tab==="tutor"?"flex":"none";
+  document.getElementById("chat").style.display = tab==="chat"?"flex":"flex":"none";
+}
+
+// EXPLAIN LOGIC
+function getMeaning(line){
+  if(line.includes("for")) return "🔁 Loop → repeats steps multiple times";
+  if(line.includes("while")) return "🔁 Loop → runs while condition is true";
+  if(line.includes("if")) return "🤔 Decision making condition";
+  if(line.includes("=")) return "📦 Assigning value to variable";
+  if(line.includes("print") || line.includes("cout")) return "🖥 Displays output";
+  return "⚙️ General execution step";
+}
+
+// EXPLAIN FUNCTION
+function explain(){
+  let code=document.getElementById("code").value;
+  let lines=code.split("\n");
+
+  let output=document.getElementById("output");
+  output.innerHTML="";
+
+  lines.forEach((line,i)=>{
+    if(line.trim()){
+      let div=document.createElement("div");
+      div.className="card";
+      div.innerHTML=`<b>Line ${i+1}</b><br>${getMeaning(line)}`;
+      output.appendChild(div);
+    }
+  });
+}
+
+// CHAT
+function send(){
+  let input=document.getElementById("msg");
+  let text=input.value;
+  if(!text) return;
+
+  let box=document.getElementById("chatbox");
+
+  box.innerHTML+=`<div class="msg user">${text}</div>`;
+  box.innerHTML+=`<div class="msg bot">Think of it like this: ${text} relates to how code executes step by step.</div>`;
+
+  input.value="";
+  box.scrollTop=box.scrollHeight;
+}
+
+</script>
+
+</body>
+</html>
+
